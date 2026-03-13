@@ -1,0 +1,2 @@
+Email,Label,is_phishing_verdict,risk_level,explanation
+6095,0,True,Medium,"The email uses unusual language, poor grammar, and a bizarre unsubscribe method involving a specific, seemingly random phrase sent to an external, obscure mailing list server (vger.kernel.org). This is a common tactic to identify if recipients will blindly copy/paste instructions, potentially revealing information or triggering malicious actions. The reference to OEM software and shipping times is a diversionary tactic, and the overall tone is unprofessional and suspicious."
