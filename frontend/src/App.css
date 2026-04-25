@@ -1,113 +1,480 @@
-/* src/App.css */
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #f5f7fa;
+:root {
+    --first-colour: #ececec;
+    --second-colour: #9fd3c7;
+    --third-colour: #385170;
+    --fourth-colour: #142d4c;
+
+    --risk-low: #53AC53;
+    --risk-medium: #ffac4d;
+    --risk-high: #FF746C;
+
+    --font-size: 0.875rem;
 }
 
-/* Keeps everything centered on screen */
-.app-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  padding-top: 40px;
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--first-colour);
 }
 
-.app-title {
-  color: #2b6a87;
-  font-size: 3rem;
-  font-weight: bold;
-  letter-spacing: 2px;
-  margin-bottom: 20px;
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 40;
 }
 
-/* This flex: 1 pushes the content to the vertical center */
-.content-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  max-width: 800px;
-  padding-bottom: 100px; /* Slight offset so it's not dead-center (looks better) */
+.overlay.active {
+    opacity: 1;
+    pointer-events: auto;
 }
 
-.input-container {
-  display: flex;
-  width: 100%;
-  gap: 15px;
-  align-items: flex-end; /* Aligns button to bottom of text box as it grows */
+.off-screen-sidebar {
+    background-color: var(--first-colour);
+    height: 100vh;
+    height: 100dvh;
+    width: 100%;
+    max-width: 300px;
+    position: fixed;
+    top: 0;
+    left: -300px;
+    transition: 0.3s ease;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+}
+.off-screen-sidebar.active {
+    left: 0;
 }
 
-.email-input {
-  flex: 1;
-  min-height: 60px;
-  max-height: 400px; /* This stops it from growing past 400px */
-  padding: 18px 25px;
-  border-radius: 25px;
-  border: 2px solid #ddd;
-  font-size: 16px;
-  background-color: white;
-  outline: none;
-  resize: none;
-  
-  /* --- THE FIX --- */
-  overflow-y: auto; /* Changed from 'hidden' to 'auto' */
-  /* ---------------- */
-
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  transition: border-color 0.2s;
-  line-height: 1.5;
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+    width: inherit;
+    padding: 0em 1em;
+}
+.sidebar-header h3 {
+    color: var(--fourth-colour);
+    cursor: pointer;
 }
 
-.email-input:focus {
-  border-color: #2b6a87;
+.sidebar-content {
+    padding: 1em;
+    width: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    flex-grow: 1;
 }
 
-.send-button {
-  height: 60px; /* Fixed height for button */
-  width: 100px;
-  background-color: #2b6a87;
-  color: white;
-  border: none;
-  border-radius: 30px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  transition: transform 0.1s;
-  flex-shrink: 0; /* Prevents button from getting squished */
+.dashboard {
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
 }
 
-.send-button:hover {
-  background-color: #205068;
-  transform: translateY(-1px);
+nav {
+    height: 6vh;
+    height: 6dvh;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.nav.risk-low{
+    background-color: var(--risk-low);
+}
+.nav.risk-medium{
+    background-color: var(--risk-medium)    ;
+}
+.nav.risk-high{
+    background-color: var(--risk-high);
 }
 
-.result-box {
-  margin-top: 40px;
-  padding: 25px;
-  border-radius: 15px;
-  width: 100%;
-  background: white;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-  text-align: left;
-  animation: fadeIn 0.5s ease-in;
+.ham-sidebar {
+    background-color: transparent;
+    width: 25px;
+    height: 25px;
+    margin-right: auto;
+    position: relative;
+    cursor: pointer;
+}
+.ham-sidebar img {
+    background-color: transparent;
+    width: 130%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: 0.3s ease;
 }
 
-.result-box.danger { border-left: 8px solid #ff4d4f; }
-.result-box.safe { border-left: 8px solid #52c41a; }
-.error-msg { color: red; margin-top: 20px; }
+.sidebar-content-top {
+    font-size: 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.new-scan {
+    height: 2.5em;
+    border: none;
+    border-radius: 6em;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.6em;
+    font-size: inherit;
+    cursor: pointer;
+}
+.new-scan:hover {
+    background-color: rgb(0, 0, 0, 0.1);
+}
+.new-scan img {
+    background-color: transparent;
+    height: 110%;
+    aspect-ratio: 1;
+}
+.new-scan p {
+    background-color: transparent;
+}
+
+.history-search input {
+    width: 100%;
+    border-radius: 6em;
+    padding: 0.6em;
+    border: 1px solid var(--fourth-colour);
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.history-list p {
+    padding: 0.6em;
+    color: rgb(80, 80, 80);
+}
+
+.email-card {
+    height: 2.5em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 6em;
+}
+.email-card:has(.email-title:hover) {
+    background-color: rgb(0, 0, 0, 0.1);
+}
+.email-card:has(.more-btn:hover) {
+    background-color: rgb(0, 0, 0, 0.1);
+}
+.email-card .email-title {
+    border: none;
+    border-radius: 6em 0 0 6em;
+    background-color: transparent;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    padding: 0.6em;
+    font-size: inherit;
+    cursor: pointer;
+}
+
+.more {
+    background-color: transparent;
+    height: 100%;
+    position: relative;
+}
+
+.more-btn {
+    background-color: transparent;
+    border: none;
+    height: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.3em;
+    opacity: 0;
+}
+.more-btn button{
+    background-color: transparent;
+    border: none;
+    border-radius: 50%;
+    height: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.more-btn button img {
+    background-color: transparent;
+    height: 70%;
+    width: 70%;
+    object-fit: contain;
+}
+.more-btn button:hover {
+    background-color: rgb(0, 0, 0, 0.1);
+}
+.email-card:hover .more-btn {
+    opacity: 1;
+    pointer-events: auto;
+}
+.more-btn.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+.more-btn.active button {
+    background-color: rgb(0, 0, 0, 0.1);
+}
+
+.more-options-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: transparent;
+    z-index: 60;
+    pointer-events: auto;
+}
+
+.more-options {
+    position: absolute;
+    width: 12em;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    border-radius: 0.6em;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 70;
+}
+.more-options button {
+    width: 100%;
+    padding: 0.6em;
+    text-align: start;
+    font-size: inherit;
+    border: none;
+    border-radius: inherit;
+    cursor: pointer;
+}
+.more-options button:hover {
+    background-color: rgb(0, 0, 0, 0.1);
+}
+
+
+.sidebar-content-bottom {
+    font-size: 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.settings {
+    height: 2.5em;
+    border: none;
+    border-radius: 6em;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.6em;
+    font-size: inherit;
+    cursor: pointer;
+}
+.settings:hover {
+    background-color: rgb(0, 0, 0, 0.1);
+}
+.settings img {
+    background-color: transparent;
+    height: 130%;
+    aspect-ratio: 1;
+}
+.settings p {
+    background-color: transparent;
+}
+
+.user-settings {
+    height: 4em;
+    border: 1px solid #142d4c;
+    border-radius: 6em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: inherit;
+    cursor: pointer;
+}
+.user-settings:hover {
+    background-color: rgb(0, 0, 0, 0.1);
+}
+.user-settings-left {
+    background-color: transparent;
+    height: inherit;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.3em;
+}
+.user-image {
+    background-color: transparent;
+    height: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+}
+.user-image img {
+    background-color: transparent;
+}
+.username {
+    background-color: transparent;
+}
+.arrow {
+    background-color: transparent;
+    height: inherit;
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.arrow img {
+    background-color: transparent;
+    height: 60%;
+    width: 60%;
+}
+
+.main-page {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1em;
+}
+
+.scan {
+    height: 2.5em;
+    width: 100%;
+    max-width: 40em;
+    background-color: white;
+    border-radius: 6em;
+    display: flex;
+    justify-content: space-between;
+}
+.scan input {
+    background-color: transparent;
+    border: none;
+    padding: 0.6em;
+    flex-grow: 1;
+    border-radius: 6em;
+}
+.scan button {
+    background-color: var(--third-colour);
+    border: none;
+    height: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.scan button img {
+    filter: invert(100%) sepia(6%) saturate(212%) hue-rotate(254deg) brightness(115%) contrast(85%);
+    background-color: transparent;
+    height: 60%;
+    aspect-ratio: 1;
+}
+
+.verdict-page {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5em;
+}
+.verdict-page.risk-low {
+    background-color: var(--risk-low);
+}
+.verdict-page.risk-medium {
+    background-color: var(--risk-medium);
+}
+.verdict-page.risk-high {
+    background-color: var(--risk-high);
+}
+
+.verdict-page-content {
+    background-color: transparent;
+    width: 100%;
+    max-width: 40em;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1em;
+}
+.verdict-page-content-header {
+    background-color: transparent;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.back-btn {
+    background-color: transparent;
+    border: none;
+    border-radius: 6em;
+    padding: 0.3em;
+    font-size: inherit;
+    font-weight: bold;
+}
+.back-btn:hover {
+    background-color: rgb(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+.verdict-page-content-header p {
+    background-color: transparent;
+    font-size: inherit;
+    font-weight: bold;
+}
+
+.verdict-icon {
+    background-color: transparent;
+    height: 8em;
+    aspect-ratio: 1;
+}
+.verdict-icon img {
+    background-color: transparent;
+    aspect-ratio: 1;
+    height: 100%;
+}
+.verdict{
+    background-color: transparent;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+.verdict-risk-level {
+    background-color: transparent;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+.verdict-explanation {
+    background-color: transparent;
 }
