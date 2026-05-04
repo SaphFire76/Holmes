@@ -1,0 +1,2 @@
+Model,Accuracy,Precision,Recall,F1 Score
+gemma3:4b,0.5,0.5,1.0,0.6666666666666666

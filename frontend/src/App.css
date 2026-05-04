@@ -24,6 +24,17 @@
     background-color: var(--first-colour);
 }
 
+button {
+    color: inherit; 
+    font-family: inherit;
+    font-size: inherit;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
 .overlay {
     position: fixed;
     top: 0;
@@ -64,12 +75,20 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 50px;
+    height: 6vh;
+    height: 6dvh;
     width: inherit;
     padding: 0em 1em;
+    flex-shrink: 0;
 }
-.sidebar-header h3 {
-    color: var(--fourth-colour);
+.sidebar-header h2{
+    background-color: transparent;
+    color: var(--third-colour);
+}
+.sidebar-header img {
+    background-color: transparent;
+    height: 70%;
+    aspect-ratio: 1;
     cursor: pointer;
 }
 
@@ -81,6 +100,7 @@
     justify-content: space-between;
     font-size: 0.875rem;
     flex-grow: 1;
+    min-height: 0;
 }
 
 .dashboard {
@@ -95,8 +115,9 @@ nav {
     height: 6dvh;
     padding: 1rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
+    gap: 1rem;
 }
 .nav.risk-low{
     background-color: var(--risk-low);
@@ -112,7 +133,6 @@ nav {
     background-color: transparent;
     width: 25px;
     height: 25px;
-    margin-right: auto;
     position: relative;
     cursor: pointer;
 }
@@ -126,11 +146,18 @@ nav {
     transition: 0.3s ease;
 }
 
+.nav h2 {
+    background-color: transparent;
+    color: var(--third-colour);
+}
+
 .sidebar-content-top {
+    flex-grow: 1;
     font-size: 0.875rem;
     display: flex;
     flex-direction: column;
     gap: 0.5em;
+    min-height: 0;
 }
 
 .new-scan {
@@ -144,9 +171,7 @@ nav {
     font-size: inherit;
     cursor: pointer;
 }
-.new-scan:hover {
-    background-color: rgb(0, 0, 0, 0.1);
-}
+
 .new-scan img {
     background-color: transparent;
     height: 110%;
@@ -163,39 +188,157 @@ nav {
     border: 1px solid var(--fourth-colour);
 }
 
-.history-list {
+.history-search {
+    background-color: rgb(255, 255, 255);
+    height: 2.5em;
+    border: none;
+    border-radius: 6em;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.6em;
+    font-size: inherit;
+    cursor: pointer;
+}
+
+.history-search img {
+    background-color: transparent;
+    height: 110%;
+    aspect-ratio: 1;
+}
+
+.history-search-page {
+    background-color: var(--first-colour);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    width: 100dvw;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    z-index: 80;
+}
+
+.history-search-header {
+    background-color: transparent;
+    width: 100%;
+    max-width: 40em;
+    display: flex;
+    padding: 0.6em;
+}
+
+.history-search-header-content {
+    background-color: white;
+    border-radius: 6em;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0.3em;
+    gap: 0.5em;
+}
+
+.history-search-header-content input {
+    font-size: inherit;
+    background-color: transparent;
+    flex-grow: 1;
+    border-radius: 6em;
+    border: none;
+}
+
+.history-search-header-content .back-btn {
+    border-radius: 50%;
+    height: 2em;
+    aspect-ratio: 1;
+    background-color: transparent;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.history-search-header-content .back-btn img {
+    background-color: transparent;
+    height: 70%;
+    aspect-ratio: 1;
+}
+
+.history-search-results {
+    background-color: transparent;
+    width: 100%;
+    max-width: 40em;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0.6em;
+}
+
+.history-list {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    min-height: 0;
+    padding-top: 2.5em;
+    margin-right: -1em;
+    padding-right: 1em;
+}
+.history-list::-webkit-scrollbar {
+    width: 8px; 
+}
+.history-list::-webkit-scrollbar-track {
+    background: transparent; 
+}
+.history-list::-webkit-scrollbar-thumb {
+    background: #c0c0c0; 
+    border-radius: 10px; /* Gives it nice rounded pill-shaped edges */
 }
 
 .history-list p {
     padding: 0.6em;
     color: rgb(80, 80, 80);
+    position: fixed;
+    margin-top: -2.5em;
 }
 
 .email-card {
     height: 2.5em;
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-radius: 6em;
 }
-.email-card:has(.email-title:hover) {
-    background-color: rgb(0, 0, 0, 0.1);
+.email-card.selected {
+    background-color: rgb(0, 0, 0, 0.2);
 }
-.email-card:has(.more-btn:hover) {
-    background-color: rgb(0, 0, 0, 0.1);
+.email-card.selected .more-btn {
+    opacity: 1;
+    pointer-events: auto;
 }
+
 .email-card .email-title {
     border: none;
     border-radius: 6em 0 0 6em;
     background-color: transparent;
     flex-grow: 1;
     display: flex;
+    justify-content: space-between;
     align-items: center;
     padding: 0.6em;
     font-size: inherit;
     cursor: pointer;
+}
+
+.email-card .email-title span {
+    background-color: transparent;
 }
 
 .more {
@@ -232,13 +375,7 @@ nav {
     width: 70%;
     object-fit: contain;
 }
-.more-btn button:hover {
-    background-color: rgb(0, 0, 0, 0.1);
-}
-.email-card:hover .more-btn {
-    opacity: 1;
-    pointer-events: auto;
-}
+
 .more-btn.active {
     opacity: 1;
     pointer-events: auto;
@@ -277,16 +414,77 @@ nav {
     border-radius: inherit;
     cursor: pointer;
 }
-.more-options button:hover {
-    background-color: rgb(0, 0, 0, 0.1);
+
+.overlay2 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    width: 100dvw;
+    height: 100dvh;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 90;
+    pointer-events: auto;
 }
 
+.hover-menu {
+    position: fixed;
+    width: 100%;
+    max-width: 30em;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--first-colour);
+    border-radius: 0.6em;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding: 1em;
+}
+
+.hover-menu h2 {
+    background-color: transparent;
+}
+
+.hover-menu form {
+    background-color: transparent;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.hover-menu input {
+    background-color: white;
+    border: none;
+    border-radius: 6em;
+    padding: 0.6em;
+    width: 100%;
+}
+
+.hover-menu .footer {
+    background-color: transparent;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5em;
+}
+.hover-menu .footer button {
+    border: none;
+    border-radius: 6em;
+    padding: 0.6em 1.2em;
+    cursor: pointer;
+}
 
 .sidebar-content-bottom {
+    flex-shrink: 0;
     font-size: 0.875rem;
     display: flex;
     flex-direction: column;
     gap: 0.5em;
+    padding-top: 0.6em;
 }
 
 .settings {
@@ -300,9 +498,7 @@ nav {
     font-size: inherit;
     cursor: pointer;
 }
-.settings:hover {
-    background-color: rgb(0, 0, 0, 0.1);
-}
+
 .settings img {
     background-color: transparent;
     height: 130%;
@@ -310,6 +506,24 @@ nav {
 }
 .settings p {
     background-color: transparent;
+}
+
+.logout {
+    height: 2.5em;
+    border: none;
+    border-radius: 6em;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.6em;
+    padding-left: 0.8em;
+    font-size: inherit;
+    cursor: pointer;
+}
+.logout img {
+    background-color: transparent;
+    height: 120%;
+    aspect-ratio: 1;
 }
 
 .user-settings {
@@ -322,9 +536,7 @@ nav {
     font-size: inherit;
     cursor: pointer;
 }
-.user-settings:hover {
-    background-color: rgb(0, 0, 0, 0.1);
-}
+
 .user-settings-left {
     background-color: transparent;
     height: inherit;
@@ -377,7 +589,13 @@ nav {
     display: flex;
     justify-content: space-between;
 }
-.scan input {
+.scan-input {
+    resize: none;
+    overflow: hidden;
+    min-height: 40px; /* Or whatever your original input height was */
+    box-sizing: border-box;
+    font-family: inherit;
+
     background-color: transparent;
     border: none;
     padding: 0.6em;
@@ -437,7 +655,7 @@ nav {
     justify-content: space-between;
     align-items: center;
 }
-.back-btn {
+.verdict-page-content-header>.back-btn {
     background-color: transparent;
     border: none;
     border-radius: 6em;
@@ -445,10 +663,7 @@ nav {
     font-size: inherit;
     font-weight: bold;
 }
-.back-btn:hover {
-    background-color: rgb(0, 0, 0, 0.1);
-    cursor: pointer;
-}
+
 .verdict-page-content-header p {
     background-color: transparent;
     font-size: inherit;
@@ -477,4 +692,58 @@ nav {
 }
 .verdict-explanation {
     background-color: transparent;
+    text-align: center;
+}
+
+@media (hover: hover) {
+    .new-scan:hover {
+        background-color: rgb(0, 0, 0, 0.1);
+    }
+
+    .history-search:hover {
+        background-color: rgb(0, 0, 0, 0.1);
+    }
+    .history-search-header-content .back-btn:hover {
+        background-color: rgb(0, 0, 0, 0.1);
+    }
+    
+    .history-list::-webkit-scrollbar-thumb:hover {
+        background: #979797; 
+    }
+    .email-card:not(.selected):has(.email-title:hover) {
+        background-color: rgb(0, 0, 0, 0.1);
+    }
+    .email-card:not(.selected):has(.more-btn:hover) {
+        background-color: rgb(0, 0, 0, 0.1);
+    }
+    .more-btn button:hover {
+        background-color: rgb(0, 0, 0, 0.1);
+    }
+    .email-card:hover .more-btn {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .more-options button:hover {
+        background-color: rgb(0, 0, 0, 0.1);
+    }
+    .hover-menu .footer button:hover {
+        background-color: rgb(0, 0, 0, 0.1);
+    }
+
+    .settings:hover {
+        background-color: rgb(0, 0, 0, 0.1);
+    }
+
+    .logout:hover {
+        background-color: rgb(0, 0, 0, 0.1);
+    }
+
+    .user-settings:hover {
+        background-color: rgb(0, 0, 0, 0.1);
+    }
+
+    .verdict-page-content-header>.back-btn:hover {
+        background-color: rgb(0, 0, 0, 0.1);
+        cursor: pointer;
+    }
 }

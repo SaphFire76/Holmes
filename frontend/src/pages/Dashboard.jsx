@@ -1,5 +1,8 @@
 import EmailCard from '../components/EmailCard';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
+import { fetchHistory, fetchFullScanVerdict, scanNewEmail, searchScanHistory, renameScanApi, deleteScanApi } from '../services/scanService';
+import { useNavigate } from 'react-router-dom';
 import UserImage from '../assets/user-image.svg';
 import AngleRight from '../assets/angle-right.svg';
 import Scan from '../assets/scan.svg';
@@ -7,35 +10,195 @@ import Gear from '../assets/gear.svg';
 import Hamburger from '../assets/hamburger.svg';
 import Warning from '../assets/warning.svg';
 import ThumbsUp from '../assets/thumbs-up.svg';
+import Search from '../assets/search.svg';
+import Back from '../assets/back.svg';
+import DoubleArrow from '../assets/double-arrow.svg';
+import Loading from '../assets/loading.svg';
+import Logout from '../assets/logout.svg';
 
 function Dashboard() {
+    const navigate = useNavigate();
+
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isUserSettingsOpen, setIsUserSettingsOpen] = useState(false);
+    const [isHistorySearchOpen, setIsHistorySearchOpen] = useState(false);
+    const [hoverMenuType, setHoverMenuType] = useState(null);
     const [emailText, setEmailText] = useState('');
+    const [historySearchTerm, setHistorySearchTerm] = useState('');
     const [scanFullVerdict, setScanFullVerdict] = useState(null);
 
-    const emails = [
-        {id: 1, content: "Welcome to our service!", verdict: "Safe", explanation: "This is a safe email.", risk_level: "Low", date: "2024-06-01"},
-        {id: 2, content: "You've won a million dollars!", verdict: "Phishing", explanation: "This is a phishing email.", risk_level: "High", date: "2024-06-02"},
-        {id: 3, content: "Your account has been compromised.", verdict: "Phishing", explanation: "This is a phishing email.", risk_level: "High", date: "2024-06-03"},
-        {id: 4, content: "Meeting scheduled for tomorrow.", verdict: "Safe", explanation: "This is a safe email.", risk_level: "Low", date: "2024-06-04"},
-    ];
+    const textareaRef = useRef(null);
 
-    const handleScan = (e) => {
-        e.preventDefault();
-        // setScanPicked(true);
-        setScanFullVerdict(emails[0]);
+    const handleTextChange = (e) => {
+        setEmailText(e.target.value);
+        
+        if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto';
+            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+        }
     };
 
-    const renameScan = (id) => {
-        // Implement rename functionality here (e.g., show input to enter new name and update email title)
-        alert(`Rename email with ID ${id}`);
-    }
+    const [scanHistory, setScanHistory] = useState([]);
+    const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const deleteEmail = (id) => {
-        // Implement delete functionality here (e.g., make API call to delete email)
-        alert(`Email with ID ${id} deleted!`);
-    }
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                // Fetch the data from the backend every single time the Dashboard mounts
+                const historyData = await fetchHistory();
+                setScanHistory(historyData);
+            } catch (error) {
+                console.error("Failed to fetch history:", error);
+                setError("Failed to load scan history. Please try again later.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadData();
+    }, []); // Empty array means "run once on load"
+
+    // Logout function to clear the token and redirect to login page
+    const handleLogout = () => {
+        // 1. Destroy the token
+        localStorage.removeItem('access_token');
+        
+        // 2. Kick them out to the login page
+        navigate('/login', { replace: true }); // 'replace: true' prevents them from using the back button!
+    };
+
+    const handleHistoryClick = async (scanId) => {
+        try {
+            // You could even add a 'setIsLoadingVerdict(true)' here if you wanted a spinner!
+            const fullVerdict = await fetchFullScanVerdict(scanId);
+            
+            // Update the state with the FULL database row
+            setScanFullVerdict(fullVerdict);
+        } catch (error) {
+            console.error("Failed to load details:", error);
+        }
+    };
+
+    const [isScanning, setIsScanning] = useState(false);
+
+    const handleScan = async (e) => {
+        console.log("Initiating scan for email:", emailText);
+        e.preventDefault();
+        if (!emailText.trim()) return;
+
+        try {
+            setIsScanning(true);
+
+            const newScanResult = await scanNewEmail(emailText);
+
+            console.log("Received new scan result:", newScanResult);
+
+            setScanFullVerdict(newScanResult);
+            setScanHistory([newScanResult, ...scanHistory]);
+            setEmailText("");
+
+        } catch (error) {
+            console.error("Failed to scan email:", error);
+            // Handle error state here for an error UI banner
+            
+        } finally {
+            // Turn OFF the loading state in the finally block!
+            setIsScanning(false);
+        }
+    };
+
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
+
+    useEffect(() => {
+        const delaySearch = setTimeout(async () => {
+            if (historySearchTerm.trim() !== '') {
+                try {
+                    setIsSearching(true);
+
+                    console.log("Searching for:", historySearchTerm);
+                    
+                    // Call the backend
+                    const results = await searchScanHistory(historySearchTerm);
+                    
+                    // Save the results to our new state
+                    setSearchResults(results);
+                } catch (error) {
+                    console.error("Search failed:", error);
+                } finally {
+                    setIsSearching(false);
+                }
+            } else {
+                // If the user clears the search box, clear the results!
+                setSearchResults([]);
+            }
+        }, 500);
+
+        return () => clearTimeout(delaySearch);
+
+    }, [historySearchTerm]);
+
+
+    const renameScan = async (id, newTitle) => {
+        // 1. Prevent empty names
+        if (!newTitle || newTitle.trim() === '') return;
+
+        try {
+            console.log(`Renaming scan ${id} to "${newTitle}"`);
+
+            // 2. Tell the database to update it
+            const data = await renameScanApi(id, newTitle);
+            const updatedTitle = data.new_title;
+
+            // 3. Update the main sidebar history instantly
+            setScanHistory((prevHistory) => 
+                prevHistory.map((scan) => 
+                    scan.scan_id === id ? { ...scan, title: updatedTitle } : scan
+                )
+            );
+
+            // 4. Update the search results (if the user is currently searching)
+            setSearchResults((prevResults) => 
+                prevResults.map((scan) => 
+                    scan.scan_id === id ? { ...scan, title: updatedTitle } : scan
+                )
+            );
+
+            // 5. Update the main view if the renamed email is currently selected!
+            if (scanFullVerdict && scanFullVerdict.scan_id === id) {
+                setScanFullVerdict({ ...scanFullVerdict, title: updatedTitle });
+            }
+
+        } catch (error) {
+            console.error("Failed to rename scan:", error);
+        }
+    };
+
+    const deleteScan = async (id) => {
+        try {
+            // 1. Tell the database to delete it permanently
+            await deleteScanApi(id);
+
+            // 2. Remove it from the main sidebar history instantly
+            setScanHistory((prevHistory) => 
+                prevHistory.filter((scan) => scan.scan_id !== id)
+            );
+
+            // 3. Remove it from the search results (if the user is currently searching)
+            setSearchResults((prevResults) => 
+                prevResults.filter((scan) => scan.scan_id !== id)
+            );
+
+            // 4. IMPORTANT: If the user is currently looking at the email they just deleted, clear the screen!
+            if (scanFullVerdict && scanFullVerdict.scan_id === id) {
+                setScanFullVerdict(null);
+            }
+
+        } catch (error) {
+            console.error("Failed to delete scan:", error);
+        }
+    };
 
     return (
         <div className="dashboard">
@@ -47,7 +210,7 @@ function Dashboard() {
             <div className={`off-screen-sidebar ${isSidebarOpen ? 'active' : ''}`}>
                 <div className="sidebar-header">
                     <h2>Holmes</h2>
-                    <h3 onClick={() => setIsSidebarOpen(false)}>⛌</h3>
+                    <img src={DoubleArrow} alt="Close Sidebar" onClick={() => setIsSidebarOpen(false)} />
                 </div>
                 <div className="sidebar-content">
                     <div className="sidebar-content-top">
@@ -59,19 +222,28 @@ function Dashboard() {
                             <img src={Scan} alt="Scan" />
                             <p>New Scan</p>
                         </button>
-                        <div className="history-search">
-                            <input type="text" placeholder="Search history..." />
-                        </div>
+                        <button className="history-search" onClick={() => {
+                            setScanFullVerdict(null);
+                            setIsSidebarOpen(false);
+                            setIsHistorySearchOpen(true);
+                        }}>
+                            <img src={Search} alt="Search" />
+                            Search History...
+                        </button>
                         <div className="history-list">
                             <p>History</p>
-                            {emails.map((email) => (
+                            {scanHistory.map((scanHistory) => (
                                 <EmailCard 
-                                    key={email.id}
-                                    email={email}
-                                    setScanFullVerdict={setScanFullVerdict}
+                                    className="recent-scans"
+                                    key={scanHistory.scan_id}
+                                    email={scanHistory}
+                                    onLoadDetails={handleHistoryClick}
                                     setIsSidebarOpen={setIsSidebarOpen}
-                                    renameEmail={renameScan}
-                                    deleteEmail={deleteEmail}
+                                    setHoverMenuType={setHoverMenuType}
+                                    scanFullVerdict={scanFullVerdict}
+                                    isHistorySearchOpen={isHistorySearchOpen}
+                                    renameScan={renameScan}
+                                    deleteScan={deleteScan}
                                 />
                             ))}
                         </div>
@@ -80,6 +252,10 @@ function Dashboard() {
                         <button className="settings">
                             <img src={Gear} alt="Settings" />
                             <p>Settings</p>
+                        </button>
+                        <button className="logout" onClick={handleLogout}>
+                            <img src={Logout} alt="Logout" />
+                            Log out
                         </button>
                         <button className="user-settings">
                             <div className="user-settings-left">
@@ -105,20 +281,31 @@ function Dashboard() {
                 >
                     <img src={Hamburger} alt="Hamburger" />
                 </div>
+                <h2>Holmes</h2>
             </nav>
             
             {!scanFullVerdict ? (
                 <div className="main-page">
                     <form onSubmit={handleScan} className="scan">
-                        <input 
-                        type="text" 
-                        placeholder="Paste email here to scan..." 
-                        className="scan-input" 
-                        value={emailText}
-                        onChange={(e) => setEmailText(e.target.value)}
+                        <textarea 
+                            ref={textareaRef}
+                            placeholder="Paste email here to scan..." 
+                            className="scan-input" 
+                            value={emailText}
+                            onChange={handleTextChange}
+                            disabled={isScanning}
+                            rows={1}
                         />
-                        <button type="submit" className="scan-button">
-                            <img src={Scan} alt="Scan" />
+                        <button 
+                            type="submit" 
+                            className={`scan-button ${isScanning ? 'loading' : ''}`}
+                            disabled={isScanning}
+                        >
+                            {isScanning ? (
+                                <img src={Loading} alt="Loading" />
+                            ) : (
+                                <img src={Scan} alt="Scan" />
+                            )}
                         </button>
                     </form>
                 </div>
@@ -133,18 +320,92 @@ function Dashboard() {
                             <p>{scanFullVerdict.date}</p>
                         </div>
                         <div className="verdict-icon">
-                            {scanFullVerdict.verdict === "Safe" ? (
-                                <img src={ThumbsUp} alt="Safe" />
-                            ) : (
+                            {scanFullVerdict.is_phishing ? (
                                 <img src={Warning} alt="Danger" />
+                            ) : (
+                                <img src={ThumbsUp} alt="Safe" />
                             )}
                         </div>
-                        <div className="verdict">{scanFullVerdict.verdict}</div>
+                        <div className="verdict">{scanFullVerdict.is_phishing ? (
+                                "Phishing"
+                            ) : (
+                                "Safe"
+                            )}
+                        </div>
                         <div className="verdict-risk-level">Risk Level: {scanFullVerdict.risk_level}</div>
                         <div className="verdict-explanation">{scanFullVerdict.explanation}</div>
                     </div>
                 </div>
             )}
+
+            {isHistorySearchOpen && (
+                <div className="history-search-page">
+                    <div className="history-search-header">
+                        <div className="history-search-header-content">
+                            <button className="back-btn" onClick={() => setIsHistorySearchOpen(false)}>
+                                <img src={Back} alt="Back" />
+                            </button>
+                            <input 
+                                type="text" 
+                                placeholder="Search scan history..." 
+                                value={historySearchTerm}
+                                onChange={(e) => setHistorySearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <div className="history-search-results">
+                        {historySearchTerm.trim() === '' ? (
+                            
+                            /* STATE 1: Search box is empty -> Show the full history */
+                            scanHistory.map((scan) => (
+                                <EmailCard 
+                                    className="recent-scans"
+                                    key={scan.scan_id}
+                                    email={scan}
+                                    onLoadDetails={handleHistoryClick}
+                                    setIsSidebarOpen={setIsSidebarOpen}
+                                    setHoverMenuType={setHoverMenuType}
+                                    scanFullVerdict={scanFullVerdict}
+                                    isHistorySearchOpen={isHistorySearchOpen}
+                                    renameScan={renameScan}
+                                    deleteScan={deleteScan}
+                                />
+                            ))
+                            
+                        ) : isSearching ? (
+                            
+                            /* STATE 2: Waiting for the backend -> Show loading text */
+                            <p className="loading-text">Searching...</p>
+                            
+                        ) : searchResults.length === 0 ? (
+                            
+                            /* STATE 3: Backend finished, but returned empty array -> Show error text */
+                            <p className="no-results-text">No emails found matching "{historySearchTerm}"</p>
+                            
+                        ) : (
+                            
+                            /* STATE 4: Backend finished and found matches -> Show search results */
+                            searchResults.map((scan) => (
+                                <EmailCard 
+                                    className="recent-scans"
+                                    key={scan.scan_id}
+                                    email={scan}
+                                    onLoadDetails={handleHistoryClick}
+                                    setIsSidebarOpen={setIsSidebarOpen}
+                                    setHoverMenuType={setHoverMenuType}
+                                    scanFullVerdict={scanFullVerdict}
+                                    isHistorySearchOpen={isHistorySearchOpen}
+                                    renameScan={renameScan}
+                                    deleteScan={deleteScan}
+                                />
+                            ))
+                            
+                        )}
+                    </div>
+                </div>
+            )}
+
+            
         </div>
     );
 }

@@ -1,0 +1,5 @@
+Model,Accuracy,Precision,Recall,F1 Score
+gemma3:4b,1.0,1.0,1.0,1.0
+llama3:latest,1.0,1.0,1.0,1.0
+qwen3.5:4b,1.0,1.0,1.0,1.0
+gemma3:12b,1.0,1.0,1.0,1.0
