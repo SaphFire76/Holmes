@@ -346,7 +346,7 @@ function Dashboard() {
                             disabled={isScanning}
                             rows={1}
                         />
-                        <div className="scan-button">
+                        <div className={`scan-button ${isExpanded ? 'expanded' : ''}`}>
                             <button 
                                 type="submit" 
                                 className={`scan-btn ${isScanning ? 'loading' : ''}`}

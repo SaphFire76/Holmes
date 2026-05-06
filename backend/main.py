@@ -13,30 +13,34 @@ import jwt
 from datetime import datetime, timedelta, timezone
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 
+allowed_origins = os.getenv("CORS_ORIGINS", "").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://192.168.56.1:5173", "http://192.168.1.51:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# In a real app, NEVER hardcode this. Put it in a .env file!
-SECRET_KEY = "your_super_secret_unguessable_key" 
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 # Token expires in 1 hour
 
-# Keep your DB credentials here (Pro-tip: move these to a .env file before deploying!)
 def get_db_connection():
     try:
         connection = mysql.connector.connect(
-            host='localhost',
-            database='Holmes',
-            user='holmes_admin',          # Replace with your MySQL username
-            password='password'   # Replace with your MySQL password
+            host=os.getenv("DB_HOST"),
+            database=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD")
         )
         return connection
     except Error as e:
@@ -115,7 +119,7 @@ class GoogleGenAIAdaptor(AIModelAdaptor):
 class LocalModelAdaptor(AIModelAdaptor):
     def __init__(self, model_name: str = 'llama3'):
         self.model_name = model_name
-        self.api_url = "http://localhost:11434/api/generate"
+        self.api_url = os.getenv("OLLAMA_API_URL", "http://localhost:11434/api/generate")
 
     def analyse(self, email: str) -> dict:
         prompt = self.get_prompt(email)
@@ -137,13 +141,16 @@ class LocalModelAdaptor(AIModelAdaptor):
 
 # ---------------------------------------------MODEL SWITCH--------------------------------------------------
 
-use_local_model = False  # Set to TRUE to use local model, FALSE to use Google GenAI
+env_use_local = os.getenv("USE_LOCAL_MODEL", "False").lower()
+use_local_model = (env_use_local == "true")
 if use_local_model:
-    ai_detector = LocalModelAdaptor(model_name='gemma3:4b') # Default to llama3, can specify other local models if needed
+    model_name = os.getenv("MODEL_NAME", "gemma3:4b")
+    ai_detector = LocalModelAdaptor(model_name=model_name) # Default to llama3, can specify other local models if needed
     print("Using local model")
 else:
     print("Using Google GenAI model")
-    ai_detector = GoogleGenAIAdaptor(api_key="AIzaSyA5AqpScGW4hs6fEIeExuV61OOo9T4l_xg")
+    api_key = os.getenv("GOOGLE_API_KEY")
+    ai_detector = GoogleGenAIAdaptor(api_key=api_key)
 
 # -----------------------------------------------------------------------------------------------------------
 
