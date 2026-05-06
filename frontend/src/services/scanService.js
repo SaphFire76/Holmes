@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = `http://${window.location.hostname}:8000`;
 
 // ==========================================
 // THE FETCH WRAPPER (Centralized Logic)
@@ -39,6 +39,12 @@ const apiFetch = async (endpoint, options = {}) => {
 // ==========================================
 // API FUNCTIONS
 // ==========================================
+
+// Fetch the logged-in user's profile info
+export const fetchUserDetails = async () => {
+    const data = await apiFetch('/users/me');
+    return data.user; 
+};
 
 // Fetch the history of scans for the logged-in user
 export const fetchHistory = async () => {

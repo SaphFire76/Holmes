@@ -1,7 +1,7 @@
 
 // Registration API call
 export const registerUser = async (email, username, password) => {
-    const response = await fetch('http://localhost:8000/register', {
+    const response = await fetch(`http://${window.location.hostname}:8000/register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -22,7 +22,7 @@ export const registerUser = async (email, username, password) => {
 
 // Login API call
 export const loginUser = async (email, password) => {
-    const response = await fetch('http://localhost:8000/login', {
+    const response = await fetch(`http://${window.location.hostname}:8000/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

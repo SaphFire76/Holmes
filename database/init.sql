@@ -62,6 +62,19 @@ DELIMITER ;
 
 DELIMITER //
 
+CREATE PROCEDURE GetUserById(
+	IN p_user_id INT
+)
+BEGIN
+    SELECT user_id, email, username 
+    FROM users 
+    WHERE user_id = p_user_id;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
 CREATE PROCEDURE GetUserScansSummary(
     IN p_user_id INT
 )

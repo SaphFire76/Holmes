@@ -4,27 +4,52 @@
     box-sizing: border-box;
 }
 
+@font-face {
+    font-family: 'London';
+    src: url('./assets/fonts/london.fill-bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 :root {
-    --first-colour: #ececec;
-    --second-colour: #9fd3c7;
-    --third-colour: #385170;
-    --fourth-colour: #142d4c;
+    --first-colour: #FAF7F0;
+    --second-colour: #D8D2C2;
+    --third-colour: #B17457;
+    --fourth-colour: #4A4947;
 
     --risk-low: #53AC53;
     --risk-medium: #ffac4d;
     --risk-high: #FF746C;
 
-    --font-size: 0.875rem;
+    --shadow-color: 43deg 15% 60%;
+    --shadow-elevation-low:
+        -0.8px 1px 1.4px hsl(var(--shadow-color) / 0.52),
+        -3.3px 4px 5.8px -2.5px hsl(var(--shadow-color) / 0.52);
+    --shadow-elevation-medium:
+        -0.8px 1px 1.4px hsl(var(--shadow-color) / 0.48),
+        -4.2px 5.2px 7.5px -1.2px hsl(var(--shadow-color) / 0.48),
+        -16.5px 20px 29.2px -2.5px hsl(var(--shadow-color) / 0.48);
+    --shadow-elevation-high:
+        -0.8px 1px 1.4px hsl(var(--shadow-color) / 0.54),
+        -7.8px 9.5px 13.8px -0.6px hsl(var(--shadow-color) / 0.54),
+        -18.7px 22.7px 33.1px -1.2px hsl(var(--shadow-color) / 0.54),
+        -41px 49.7px 72.5px -1.9px hsl(var(--shadow-color) / 0.54),
+        -82.4px 100px 145.8px -2.5px hsl(var(--shadow-color) / 0.54);
 }
 
 *{
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--first-colour);
 }
 
-button {
+body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: var(--first-colour);
+    font-size: 0.92rem;
+}
+
+button, input, textarea {
+    background-color: transparent;
     color: inherit; 
     font-family: inherit;
     font-size: inherit;
@@ -33,6 +58,69 @@ button {
     -webkit-appearance: none;
 
     -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+    width: 8px; 
+}
+::-webkit-scrollbar-track {
+    background: transparent; 
+}
+::-webkit-scrollbar-thumb {
+    background: #c0c0c0; 
+    border-radius: 10px; /* Gives it nice rounded pill-shaped edges */
+}
+
+input:focus, 
+textarea:focus {
+    outline: none; 
+}
+
+input, 
+textarea {
+    -webkit-tap-highlight-color: transparent;
+}
+
+h1 {
+    background-color: transparent;
+    font-family: 'Dm Sans', sans-serif;
+    font-size: 2.3rem;
+    font-weight: 600;
+    text-shadow: -0.8px 1px 1.4px hsl(var(--shadow-color) / 0.48),
+        -4.2px 5.2px 7.5px hsl(var(--shadow-color) / 0.48),
+        -16.5px 20px 29.2px hsl(var(--shadow-color) / 0.48);
+}
+
+.loading-screen {
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (min-width: 1440px) {
+    .overlay {
+        display: none !important; /* completely kill the overlay */
+    }
+    
+    .main-page.sidebar-open {
+        margin-left: 300px; 
+        width: calc(100% - 300px); 
+    }
+
+    .verdict-page.risk-low.sidebar-open {
+        margin-left: 300px; 
+        width: calc(100% - 300px); 
+    }
+    .verdict-page.risk-medium.sidebar-open {
+        margin-left: 300px; 
+        width: calc(100% - 300px); 
+    }
+    .verdict-page.risk-high.sidebar-open {
+        margin-left: 300px; 
+        width: calc(100% - 300px); 
+    }
 }
 
 .overlay {
@@ -81,10 +169,6 @@ button {
     padding: 0em 1em;
     flex-shrink: 0;
 }
-.sidebar-header h2{
-    background-color: transparent;
-    color: var(--third-colour);
-}
 .sidebar-header img {
     background-color: transparent;
     height: 70%;
@@ -98,7 +182,6 @@ button {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    font-size: 0.875rem;
     flex-grow: 1;
     min-height: 0;
 }
@@ -146,14 +229,8 @@ nav {
     transition: 0.3s ease;
 }
 
-.nav h2 {
-    background-color: transparent;
-    color: var(--third-colour);
-}
-
 .sidebar-content-top {
     flex-grow: 1;
-    font-size: 0.875rem;
     display: flex;
     flex-direction: column;
     gap: 0.5em;
@@ -208,6 +285,7 @@ nav {
 }
 
 .history-search-page {
+    font-size: 1rem;
     background-color: var(--first-colour);
     position: fixed;
     top: 0;
@@ -226,7 +304,7 @@ nav {
 .history-search-header {
     background-color: transparent;
     width: 100%;
-    max-width: 40em;
+    max-width: 45em;
     display: flex;
     padding: 0.6em;
 }
@@ -272,12 +350,13 @@ nav {
 .history-search-results {
     background-color: transparent;
     width: 100%;
-    max-width: 40em;
+    max-width: 45em;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-start;
     padding: 0.6em;
+    overflow-y: scroll;
 }
 
 .history-list {
@@ -289,21 +368,13 @@ nav {
     padding-top: 2.5em;
     margin-right: -1em;
     padding-right: 1em;
-}
-.history-list::-webkit-scrollbar {
-    width: 8px; 
-}
-.history-list::-webkit-scrollbar-track {
-    background: transparent; 
-}
-.history-list::-webkit-scrollbar-thumb {
-    background: #c0c0c0; 
-    border-radius: 10px; /* Gives it nice rounded pill-shaped edges */
+    margin-left: -1em;
+    padding-left: 1em;
 }
 
 .history-list p {
     padding: 0.6em;
-    color: rgb(80, 80, 80);
+    color: var(--fourth-colour);
     position: fixed;
     margin-top: -2.5em;
 }
@@ -317,7 +388,8 @@ nav {
     border-radius: 6em;
 }
 .email-card.selected {
-    background-color: rgb(0, 0, 0, 0.2);
+    background-color: var(--second-colour);
+    box-shadow: var(--shadow-elevation-low);
 }
 .email-card.selected .more-btn {
     opacity: 1;
@@ -356,7 +428,7 @@ nav {
     justify-content: center;
     align-items: center;
     padding: 0.3em;
-    opacity: 0;
+    opacity: 1;
 }
 .more-btn button{
     background-color: transparent;
@@ -396,13 +468,13 @@ nav {
 }
 
 .more-options {
-    position: absolute;
-    width: 12em;
+    background-color: var(--first-colour);
+    width: 9em;
     display: flex;
     flex-direction: column;
     align-items: start;
-    border-radius: 0.6em;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    box-shadow: var(--shadow-elevation-medium);
     z-index: 70;
 }
 .more-options button {
@@ -430,18 +502,32 @@ nav {
 
 .hover-menu {
     position: fixed;
-    width: 100%;
+    width: 25em;
     max-width: 30em;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--first-colour);
-    border-radius: 0.6em;
+    border-radius: 20px;
     z-index: 100;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     gap: 1em;
     padding: 1em;
+    box-shadow: -0.8px 1px 1.4px hsl(41deg 3% 31% / 0.48),
+        -4.2px 5.2px 7.5px -1.2px hsl(41deg 3% 31% / 0.48),
+        -16.5px 20px 29.2px -2.5px hsl(41deg 3% 31% / 0.48);
+}
+
+.hover-menu h2,
+.hover-menu p {
+    /* 2. Kill any rogue spacing */
+    margin: 0 !important; 
+    padding: 0 !important;
+    
+    /* 4. Force standard flow (kills any rogue 'position: absolute' rules) */
+    position: static !important; 
 }
 
 .hover-menu h2 {
@@ -474,13 +560,16 @@ nav {
 .hover-menu .footer button {
     border: none;
     border-radius: 6em;
-    padding: 0.6em 1.2em;
+    padding: 0.6em 1.5em;
     cursor: pointer;
+}
+.hover-menu .footer button:nth-child(2) {
+    color: white;
+    background-color: var(--third-colour);
 }
 
 .sidebar-content-bottom {
     flex-shrink: 0;
-    font-size: 0.875rem;
     display: flex;
     flex-direction: column;
     gap: 0.5em;
@@ -537,27 +626,32 @@ nav {
     cursor: pointer;
 }
 
-.user-settings-left {
-    background-color: transparent;
-    height: inherit;
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-    padding: 0.3em;
-}
-.user-image {
+.user-settings .user-image {
     background-color: transparent;
     height: 100%;
     aspect-ratio: 1;
     border-radius: 50%;
 }
-.user-image img {
+.user-settings .user-image img {
     background-color: transparent;
 }
-.username {
+
+.user-settings .user-text-info {
+    flex-grow: 1;
     background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.1em;
+    padding: 0.1em;
 }
-.arrow {
+.user-settings .user-text-info .email-address {
+    font-size: 0.9em;
+    color: rgb(61, 61, 61);
+}
+
+.user-settings .arrow {
     background-color: transparent;
     height: inherit;
     aspect-ratio: 1;
@@ -565,7 +659,7 @@ nav {
     justify-content: center;
     align-items: center;
 }
-.arrow img {
+.user-settings .arrow img {
     background-color: transparent;
     height: 60%;
     width: 60%;
@@ -573,40 +667,96 @@ nav {
 
 .main-page {
     flex-grow: 1;
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1em;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.welcome-text {
+    width: 100%;
+    max-width: 45em;
+    height: 45%;
+    padding: 1em;
+    background-color: transparent;
+    margin-bottom: 1em;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    padding: 1em;
+}
+.welcome-text > :first-child {
+    font-size: 1.5rem;
+    margin-bottom: 0.2em;
+}
+.welcome-text > :nth-child(2) {
+    font-size: 2.5rem;
+    margin-bottom: 0.4em;
+}
+.welcome-text > ul {
+    padding-left: 1em;
+    list-style-type: circle;
+    line-height: 1.5;
 }
 
 .scan {
-    height: 2.5em;
     width: 100%;
-    max-width: 40em;
+    max-width: 45em;
     background-color: white;
-    border-radius: 6em;
+    border-radius: 20px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+
+    /* Default State */
+    border-radius: 100px;
+    transition: border-radius 0.15s ease;
+    will-change: border-radius;
+
+    box-shadow: var(--shadow-elevation-high);
 }
+.scan.expanded {
+    border-radius: 20px;
+}
+
 .scan-input {
     resize: none;
-    overflow: hidden;
-    min-height: 40px; /* Or whatever your original input height was */
-    box-sizing: border-box;
-    font-family: inherit;
+    overflow-y: auto;
+    max-height: 15em;
+    line-height: 1.5;
+    background-color: white;
+    border: none;
+    padding: 1em;
+    flex-grow: 1;
+    
+    /* Default State */
+    border-radius: 100px;
+    transition: border-radius 0.15s ease;
+    will-change: border-radius;
+}
+.scan-input.expanded {
+    border-radius: 20px;
+}
 
+.scan-button {
     background-color: transparent;
     border: none;
-    padding: 0.6em;
-    flex-grow: 1;
-    border-radius: 6em;
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    padding: 0.5em;
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: flex-end;
 }
 .scan button {
     background-color: var(--third-colour);
     border: none;
+    width: 100%;
     height: 100%;
-    aspect-ratio: 1;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -616,7 +766,7 @@ nav {
 .scan button img {
     filter: invert(100%) sepia(6%) saturate(212%) hue-rotate(254deg) brightness(115%) contrast(85%);
     background-color: transparent;
-    height: 60%;
+    height: 20px;
     aspect-ratio: 1;
 }
 
@@ -627,6 +777,7 @@ nav {
     justify-content: center;
     align-items: center;
     padding: 1.5em;
+    transition: margin-left 0.3s ease, width 0.3s ease;
 }
 .verdict-page.risk-low {
     background-color: var(--risk-low);
@@ -719,6 +870,9 @@ nav {
     .more-btn button:hover {
         background-color: rgb(0, 0, 0, 0.1);
     }
+    .more-btn {
+        opacity: 0;
+    }
     .email-card:hover .more-btn {
         opacity: 1;
         pointer-events: auto;
@@ -746,4 +900,78 @@ nav {
         background-color: rgb(0, 0, 0, 0.1);
         cursor: pointer;
     }
+}
+
+
+/* Login & Register Pages */
+.auth-page > h1 {
+    margin-top: 5px;
+    width: 100%;
+    text-align: center;
+}
+
+.auth-menu {
+    position: fixed;
+    width: 90%;
+    max-width: 30em;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--first-colour);
+    border-radius: 20px;
+    box-shadow:  var(--shadow-elevation-high);
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding: 1em;
+}
+
+.auth-menu form {
+    background-color: transparent;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.auth-menu form div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.auth-menu form div label {
+    color: rgb(80, 80, 80);
+    background-color: transparent;
+}
+
+.auth-menu form div input {
+    background-color: white;
+    border: none;
+    border-radius: 6em;
+    padding: 0.6em;
+}
+
+.auth-menu form button {
+    background-color: var(--third-colour);
+    border: none;
+    height: 2.5em;
+    border-radius: 6em;
+    color: white;
+    font-size: inherit;
+    cursor: pointer;
+}
+
+.auth-redirect {
+    background-color: transparent;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.auth-redirect button {
+    background-color: transparent;
+    border: none;
+    color: var(--third-colour);
+    font-size: inherit;
+    cursor: pointer;
 }

@@ -37,40 +37,46 @@ function Login() {
     };
 
     return (
-        <div className="login">
-            <h2>Login</h2>
-            
-            {/* Display error messages if they exist (e.g., wrong password) */}
-            {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
-
-            <form className="login-form" onSubmit={(e) => {
-                e.preventDefault();
-                handleLogin();
-            }}>
-                <div>
-                    <label>Email:</label>
-                    <input 
-                        type="email" 
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label>Password:</label>
-                    <input 
-                        type="password" 
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
+        <div className="auth-page">
+            <h1>HOLMES</h1>
+            <div className="auth-menu">
+                <h2>Login</h2>
                 
-                {/* Disable the button while it's fetching */}
-                <button type="submit" disabled={isLoading}>
-                    {isLoading ? 'Logging in...' : 'Login'}
-                </button>
-            </form>
+                {/* Display error messages if they exist (e.g., wrong password) */}
+                {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
+
+                <form className="auth-form" onSubmit={(e) => {
+                    e.preventDefault();
+                    handleLogin();
+                }}>
+                    <div>
+                        <input 
+                            type="email" 
+                            required
+                            value={email}
+                            placeholder='Email'
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <input 
+                            type="password" 
+                            required
+                            value={password}
+                            placeholder='Password'
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
+                    
+                    {/* Disable the button while it's fetching */}
+                    <button type="submit" disabled={isLoading}>
+                        {isLoading ? 'Logging in...' : 'Login'}
+                    </button>
+                </form>
+                <div className="auth-redirect">
+                    <button onClick={() => navigate('/register')}>Don't have an account? Register</button>
+                </div>
+            </div>
         </div>
     );
 }

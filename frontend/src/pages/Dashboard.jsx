@@ -1,31 +1,55 @@
 import EmailCard from '../components/EmailCard';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { fetchHistory, fetchFullScanVerdict, scanNewEmail, searchScanHistory, renameScanApi, deleteScanApi } from '../services/scanService';
+import { fetchUserDetails, fetchHistory, fetchFullScanVerdict, scanNewEmail, searchScanHistory, renameScanApi, deleteScanApi } from '../services/scanService';
 import { useNavigate } from 'react-router-dom';
-import UserImage from '../assets/user-image.svg';
-import AngleRight from '../assets/angle-right.svg';
-import Scan from '../assets/scan.svg';
-import Gear from '../assets/gear.svg';
-import Hamburger from '../assets/hamburger.svg';
-import Warning from '../assets/warning.svg';
-import ThumbsUp from '../assets/thumbs-up.svg';
-import Search from '../assets/search.svg';
-import Back from '../assets/back.svg';
-import DoubleArrow from '../assets/double-arrow.svg';
-import Loading from '../assets/loading.svg';
-import Logout from '../assets/logout.svg';
+import UserImage from '../assets/images/user-image.svg';
+import AngleRight from '../assets/images/angle-right.svg';
+import Scan from '../assets/images/scan.svg';
+import Gear from '../assets/images/gear.svg';
+import Hamburger from '../assets/images/hamburger.svg';
+import Warning from '../assets/images/warning.svg';
+import ThumbsUp from '../assets/images/thumbs-up.svg';
+import Search from '../assets/images/search.svg';
+import Back from '../assets/images/back.svg';
+import DoubleArrow from '../assets/images/double-arrow.svg';
+import Loading from '../assets/images/loading.svg';
+import Logout from '../assets/images/logout.svg';
 
 function Dashboard() {
     const navigate = useNavigate();
 
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return window.innerWidth >= 1440;
+        }
+        return false;
+    });
+
     const [isUserSettingsOpen, setIsUserSettingsOpen] = useState(false);
     const [isHistorySearchOpen, setIsHistorySearchOpen] = useState(false);
     const [hoverMenuType, setHoverMenuType] = useState(null);
     const [emailText, setEmailText] = useState('');
     const [historySearchTerm, setHistorySearchTerm] = useState('');
     const [scanFullVerdict, setScanFullVerdict] = useState(null);
+
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    // This watches the emailText. Every time they type, it checks the height!
+    useLayoutEffect(() => {
+        if (textareaRef.current) {
+            // Grab the physical height of the textarea in pixels
+            const currentHeight = textareaRef.current.offsetHeight;
+            
+            // A single line with your 1em padding is usually around 50-55px tall.
+            // If it grows taller than 60px, we know it has wrapped to a second line!
+            if (currentHeight > 60) {
+                setIsExpanded(true);
+            } else {
+                setIsExpanded(false);
+            }
+        }
+    }, [emailText]); // Re-run this check every time the text changes
 
     const textareaRef = useRef(null);
 
@@ -38,6 +62,7 @@ function Dashboard() {
         }
     };
 
+    const [userData, setUserData] = useState(null);
     const [scanHistory, setScanHistory] = useState([]);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -45,12 +70,17 @@ function Dashboard() {
     useEffect(() => {
         const loadData = async () => {
             try {
-                // Fetch the data from the backend every single time the Dashboard mounts
-                const historyData = await fetchHistory();
+                // Fire both API calls simultaneously 
+                const [userInfo, historyData] = await Promise.all([
+                    fetchUserDetails(),
+                    fetchHistory()
+                ]);
+
+                setUserData(userInfo);
                 setScanHistory(historyData);
             } catch (error) {
-                console.error("Failed to fetch history:", error);
-                setError("Failed to load scan history. Please try again later.");
+                console.error("Failed to fetch dashboard data:", error);
+                setError("Failed to load dashboard. Please try again later.");
             } finally {
                 setIsLoading(false);
             }
@@ -200,6 +230,14 @@ function Dashboard() {
         }
     };
 
+    if (isLoading || !userData) {
+        return (
+            <div className="loading-screen">
+                <img src={Loading} alt="Loading"></img>
+            </div>
+        );
+    }
+
     return (
         <div className="dashboard">
             <div 
@@ -209,14 +247,16 @@ function Dashboard() {
 
             <div className={`off-screen-sidebar ${isSidebarOpen ? 'active' : ''}`}>
                 <div className="sidebar-header">
-                    <h2>Holmes</h2>
+                    <h1>HOLMES</h1>
                     <img src={DoubleArrow} alt="Close Sidebar" onClick={() => setIsSidebarOpen(false)} />
                 </div>
                 <div className="sidebar-content">
                     <div className="sidebar-content-top">
                         <button className="new-scan" onClick={() => {
                             setScanFullVerdict(null);
-                            setIsSidebarOpen(false);
+                            if (window.innerWidth < 1440) {
+                                setIsSidebarOpen(false);
+                            }
                             setEmailText('');
                         }}>
                             <img src={Scan} alt="Scan" />
@@ -232,11 +272,11 @@ function Dashboard() {
                         </button>
                         <div className="history-list">
                             <p>History</p>
-                            {scanHistory.map((scanHistory) => (
+                            {scanHistory.map((scan) => (
                                 <EmailCard 
                                     className="recent-scans"
-                                    key={scanHistory.scan_id}
-                                    email={scanHistory}
+                                    key={scan.scan_id}
+                                    email={scan}
                                     onLoadDetails={handleHistoryClick}
                                     setIsSidebarOpen={setIsSidebarOpen}
                                     setHoverMenuType={setHoverMenuType}
@@ -249,18 +289,19 @@ function Dashboard() {
                         </div>
                     </div>
                     <div className="sidebar-content-bottom">
-                        <button className="settings">
+                        {/* <button className="settings">
                             <img src={Gear} alt="Settings" />
                             <p>Settings</p>
-                        </button>
+                        </button> */}
                         <button className="logout" onClick={handleLogout}>
                             <img src={Logout} alt="Logout" />
                             Log out
                         </button>
                         <button className="user-settings">
-                            <div className="user-settings-left">
-                                <div className="user-image"><img src={UserImage} alt="User" /></div>
-                                <div className="username">John Doe</div>
+                            <div className="user-image"><img src={UserImage} alt="User" /></div>
+                            <div className="user-text-info">
+                                <div className="username">{userData.username}</div>
+                                <div className="email-address">{userData.email}</div>
                             </div>
                             <div className="arrow">
                                 <img src={AngleRight} alt="Arrow" />
@@ -281,41 +322,52 @@ function Dashboard() {
                 >
                     <img src={Hamburger} alt="Hamburger" />
                 </div>
-                <h2>Holmes</h2>
+                <h1>HOLMES</h1>
             </nav>
             
             {!scanFullVerdict ? (
-                <div className="main-page">
-                    <form onSubmit={handleScan} className="scan">
+                <div className={`main-page ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+                    <div className="welcome-text">
+                        <p>Hello 👋 ,</p>
+                        <p>Found something phishy? 🎣</p>
+                        <ul>
+                            <li>Paste the email below to scan it.</li>
+                            <li>For best results, include the entire email.</li>
+                            <li>For even better results, include the email headers.</li>
+                        </ul>
+                    </div>
+                    <form onSubmit={handleScan} className={`scan ${isExpanded ? 'expanded' : ''}`}>
                         <textarea 
                             ref={textareaRef}
-                            placeholder="Paste email here to scan..." 
-                            className="scan-input" 
+                            placeholder="Paste away!" 
+                            className={`scan-input ${isExpanded ? 'expanded' : ''}`} 
                             value={emailText}
                             onChange={handleTextChange}
                             disabled={isScanning}
                             rows={1}
                         />
-                        <button 
-                            type="submit" 
-                            className={`scan-button ${isScanning ? 'loading' : ''}`}
-                            disabled={isScanning}
-                        >
-                            {isScanning ? (
-                                <img src={Loading} alt="Loading" />
-                            ) : (
-                                <img src={Scan} alt="Scan" />
-                            )}
-                        </button>
+                        <div className="scan-button">
+                            <button 
+                                type="submit" 
+                                className={`scan-btn ${isScanning ? 'loading' : ''}`}
+                                disabled={isScanning}
+                            >
+                                {isScanning ? (
+                                    <img src={Loading} alt="Loading" />
+                                ) : (
+                                    <img src={Scan} alt="Scan" />
+                                )}
+                            </button>
+                        </div>
                     </form>
                 </div>
             ) : (
-                <div className={`verdict-page risk-${scanFullVerdict.risk_level.toLowerCase()}`}>
+                <div className={`verdict-page risk-${scanFullVerdict.risk_level.toLowerCase()} ${isSidebarOpen ? 'sidebar-open' : ''}`}>
                     <div className="verdict-page-content">
                         <div className="verdict-page-content-header">
                             <button className="back-btn" onClick={() => {
-                                setScanFullVerdict(null)
-                                setEmailText(scanFullVerdict.content);
+                                setEmailText(scanFullVerdict.email);
+                                setScanFullVerdict(null);
                             }}>&lt; Back</button>
                             <p>{scanFullVerdict.date}</p>
                         </div>

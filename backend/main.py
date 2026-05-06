@@ -18,7 +18,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "http://192.168.56.1:5173", "http://192.168.1.51:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -348,6 +348,39 @@ async def login_user(user: UserLogin):
             "message": "Login successful"
         }
     
+    except mysql.connector.Error as e:
+        print(f"Database Error: {e}")
+        raise HTTPException(status_code=500, detail="Database error occurred")
+        
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+
+
+@app.get("/users/me")
+async def get_user_profile(user_id: str = Depends(get_current_user)):
+    # The 'user_id' is automatically extracted from the token by your 'get_current_user' function
+    conn = get_db_connection()
+    if not conn:
+        raise HTTPException(status_code=500, detail="Database connection failed")
+
+    try:
+        print(f"DEBUG - Fetching profile for User ID: {user_id}")
+        cursor = conn.cursor(dictionary=True) 
+        cursor.callproc('GetUserById', (user_id,))
+        
+        user_data = None
+        for result in cursor.stored_results():
+            user_data = result.fetchone()
+
+        print(f"DEBUG - User Data from DB: {user_data}")
+            
+        if not user_data:
+            raise HTTPException(status_code=404, detail="User not found")
+            
+        return {"user": user_data}
+
     except mysql.connector.Error as e:
         print(f"Database Error: {e}")
         raise HTTPException(status_code=500, detail="Database error occurred")

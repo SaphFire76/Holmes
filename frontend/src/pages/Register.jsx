@@ -35,49 +35,55 @@ function Register() {
     };
 
     return (
-        <div className="register">
-            <h2>Register</h2>
-            
-            {/* Display error messages if they exist */}
-            {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
-
-            <form className="register-form" onSubmit={(e) => {
-                e.preventDefault();
-                handleRegister();
-            }}>
-                <div>
-                    <label>Email:</label>
-                    <input 
-                        type="email" 
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label>Username:</label>
-                    <input 
-                        type="text" 
-                        required
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label>Password:</label>
-                    <input 
-                        type="password" 
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </div>
+        <div className="auth-page">
+            <h1>HOLMES</h1>
+            <div className="auth-menu">
+                <h2>Register</h2>
                 
-                {/* Disable the button while the request is running so they don't double-click */}
-                <button type="submit" disabled={isLoading}>
-                    {isLoading ? 'Registering...' : 'Register'}
-                </button>
-            </form>
+                {/* Display error messages if they exist */}
+                {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
+
+                <form className="auth-form" onSubmit={(e) => {
+                    e.preventDefault();
+                    handleRegister();
+                }}>
+                    <div>
+                        <input 
+                            type="email" 
+                            required
+                            value={email}
+                            placeholder='Email'
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <input 
+                            type="text" 
+                            required
+                            value={username}
+                            placeholder='Username'
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <input 
+                            type="password" 
+                            required
+                            value={password}
+                            placeholder='Password'
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
+                    
+                    {/* Disable the button while the request is running so they don't double-click */}
+                    <button type="submit" disabled={isLoading}>
+                        {isLoading ? 'Registering...' : 'Register'}
+                    </button>
+                </form>
+                <div className="auth-redirect">
+                    <button onClick={() => navigate('/login')}>Already have an account? Login</button>
+                </div>
+            </div>
         </div>
     );
 }
