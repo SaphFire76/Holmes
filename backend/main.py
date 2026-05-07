@@ -40,12 +40,13 @@ def get_db_connection():
             host=os.getenv("DB_HOST"),
             database=os.getenv("DB_NAME"),
             user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD")
+            password=os.getenv("DB_PASSWORD"),
+            port=int(os.getenv("DB_PORT", 3306))
         )
         return connection
     except Error as e:
-        print(f"Error connecting to MySQL: {e}")
-        return None
+        print(f"CRITICAL: Database connection failed: {e}")
+        raise e
 
 def create_access_token(data: dict):
     """Creates the JWT token with an expiration date"""
