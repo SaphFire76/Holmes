@@ -81,7 +81,7 @@ function EmailCard({ email, onLoadDetails, setIsSidebarOpen, scanFullVerdict, is
 
             {hoverMenuType && (
                 <div className="overlay2" onClick={() => setHoverMenuType(null)}>
-                    <div className="hover-menu">
+                    <div className="hover-menu" onClick={(e) => e.stopPropagation()}>
                         {hoverMenuType === 'rename' ? (
                             <>
                                 <h2>Rename</h2>
