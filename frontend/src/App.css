@@ -384,7 +384,7 @@ nav {
 }
 .email-card.selected {
     background-color: var(--second-colour);
-    box-shadow: var(--shadow-elevation-low);
+    box-shadow: var(--shadow-elevation-medium);
 }
 .email-card.selected .more-btn {
     opacity: 1;
@@ -612,7 +612,8 @@ nav {
 
 .user-settings {
     height: 4em;
-    border: 1px solid #142d4c;
+    box-shadow: var(--shadow-elevation-high);
+    border: none;
     border-radius: 6em;
     display: flex;
     justify-content: space-between;
