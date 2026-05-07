@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.BACKEND_API_BASE_URL || `http://${window.location.hostname}:8000`;
+const BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL || `http://${window.location.hostname}:8000`;
 
 // ==========================================
 // THE FETCH WRAPPER (Centralized Logic)
