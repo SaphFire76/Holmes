@@ -27,7 +27,7 @@ joblib==1.5.2
 markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
-mysql-connector-python==9.6.0
+mysql-connector-python==9.7.0
 numpy==2.2.3
 passlib==1.7.4
 pyasn1==0.6.3
