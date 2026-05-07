@@ -258,13 +258,6 @@ nav {
     background-color: transparent;
 }
 
-.history-search input {
-    width: 100%;
-    border-radius: 6em;
-    padding: 0.6em;
-    border: 1px solid var(--fourth-colour);
-}
-
 .history-search {
     background-color: rgb(255, 255, 255);
     height: 2.5em;
@@ -316,16 +309,18 @@ nav {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    padding: 0.3em;
+    padding: 0 0.3em;
     gap: 0.5em;
 }
 
 .history-search-header-content input {
+    height: 2.5em;
     font-size: inherit;
     background-color: transparent;
     flex-grow: 1;
     border-radius: 6em;
     border: none;
+    padding: 0.6em;
 }
 
 .history-search-header-content .back-btn {

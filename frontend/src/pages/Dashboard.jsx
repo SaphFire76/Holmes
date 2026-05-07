@@ -31,7 +31,6 @@ function Dashboard() {
     const [hoverMenuType, setHoverMenuType] = useState(null);
     const [emailText, setEmailText] = useState('');
     const [historySearchTerm, setHistorySearchTerm] = useState('');
-    const [scanFullVerdict, setScanFullVerdict] = useState(null);
 
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -97,9 +96,13 @@ function Dashboard() {
         // 2. Kick them out to the login page
         navigate('/login', { replace: true }); // 'replace: true' prevents them from using the back button!
     };
+    
+    const [scanFullVerdict, setScanFullVerdict] = useState(null);
+    const [isLoadingVerdict, setIsLoadingVerdict] = useState(false);
 
     const handleHistoryClick = async (scanId) => {
         try {
+            setIsLoadingVerdict(true);
             // You could even add a 'setIsLoadingVerdict(true)' here if you wanted a spinner!
             const fullVerdict = await fetchFullScanVerdict(scanId);
             
@@ -107,6 +110,8 @@ function Dashboard() {
             setScanFullVerdict(fullVerdict);
         } catch (error) {
             console.error("Failed to load details:", error);
+        } finally {
+            setIsLoadingVerdict(false);
         }
     };
 
@@ -281,7 +286,9 @@ function Dashboard() {
                                     setIsSidebarOpen={setIsSidebarOpen}
                                     setHoverMenuType={setHoverMenuType}
                                     scanFullVerdict={scanFullVerdict}
+                                    isLoadingVerdict={isLoadingVerdict}
                                     isHistorySearchOpen={isHistorySearchOpen}
+                                    setIsHistorySearchOpen={setIsHistorySearchOpen}
                                     renameScan={renameScan}
                                     deleteScan={deleteScan}
                                 />
@@ -418,7 +425,9 @@ function Dashboard() {
                                     setIsSidebarOpen={setIsSidebarOpen}
                                     setHoverMenuType={setHoverMenuType}
                                     scanFullVerdict={scanFullVerdict}
+                                    isLoadingVerdict={isLoadingVerdict}
                                     isHistorySearchOpen={isHistorySearchOpen}
+                                    setIsHistorySearchOpen={setIsHistorySearchOpen}
                                     renameScan={renameScan}
                                     deleteScan={deleteScan}
                                 />
@@ -446,7 +455,9 @@ function Dashboard() {
                                     setIsSidebarOpen={setIsSidebarOpen}
                                     setHoverMenuType={setHoverMenuType}
                                     scanFullVerdict={scanFullVerdict}
+                                    isLoadingVerdict={isLoadingVerdict}
                                     isHistorySearchOpen={isHistorySearchOpen}
+                                    setIsHistorySearchOpen={setIsHistorySearchOpen}
                                     renameScan={renameScan}
                                     deleteScan={deleteScan}
                                 />

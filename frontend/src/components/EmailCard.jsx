@@ -2,7 +2,7 @@ import { createPortal } from 'react-dom';
 import { useState, useRef } from 'react';
 import MoreIcon from '../assets/images/more-horiz.svg';
 
-function EmailCard({ email, onLoadDetails, setIsSidebarOpen, scanFullVerdict, isHistorySearchOpen, renameScan, deleteScan }) {
+function EmailCard({ email, onLoadDetails, setIsSidebarOpen, scanFullVerdict, isLoadingVerdict, isHistorySearchOpen, setIsHistorySearchOpen, renameScan, deleteScan }) {
     const [newTitle, setNewTitle] = useState("");
     const email_title = email.title.length > 28 ? email.title.substring(0, 25) + '...' : email.title;
 
@@ -31,10 +31,13 @@ function EmailCard({ email, onLoadDetails, setIsSidebarOpen, scanFullVerdict, is
     return (
         <>
             <div className={`email-card ${isSelected ? 'selected' : ''}`}>
-                <button className="email-title" onClick={() => {
-                    onLoadDetails(email.scan_id);
-                    if (window.innerWidth < 1440) {
-                        setIsSidebarOpen(false);
+                <button className="email-title" onClick={async () => {
+                    await onLoadDetails(email.scan_id);
+                    if (!isLoadingVerdict) {
+                        setIsHistorySearchOpen(false);
+                        if (window.innerWidth < 1440) {
+                            setIsSidebarOpen(false);
+                        }
                     }
                 }}>
                     {email_title}
