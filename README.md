@@ -14,8 +14,10 @@ This system is designed for everyday internet users and professionals who want a
 * **Visual Risk Indicators:** Easily identify low, medium, or high risk threats.
 
 ### How to access the software
-* **Live Application:** [https://holmes-nine.vercel.app](https://holmes-nine.vercel.app)
-* **Repository:** [Insert your GitHub Link here]
+* Use this live link: [https://holmes-nine.vercel.app](https://holmes-nine.vercel.app)
+* Or run it locally by following the setup steps in the repository
+
+> ⚠️ **Security & Privacy Notice:** Please **do not** submit real emails containing sensitive Personal Identifiable Information (PII), confidential business data, financial records, or actual passwords. **All submitted emails are currently saved in plain text within the database**, and the application utilises external AI APIs (like Google Gemini) to process the text. For these reasons, you should treat any data submitted through this tool as completely public. Always use dummy data or redact sensitive information before scanning.
 
 ### How to use the software
 1. Log in using the test details below or register.
@@ -27,39 +29,39 @@ This system is designed for everyday internet users and professionals who want a
 7. Click on the 'Search History' bar in the sidebar to search for past scans.
 
 ### Test details
-*You can create your own account, or use this seeded demo account:*
+You can create your own account, or use this seeded demo account:
 * **Email:** test@test.com
 * **Password:** password
 
 ### Sample input for testing
-**Phishing Email:**
-```
-From: noreply@g00gleacc.com (Note the zero in google)
-Subject: Urgent: Suspicious sign-in attempt
-Dear User,
-Someone recently used your password to sign in to your account. We have blocked this login attempt. Please check your account activity and update your password immediately by clicking the link below:
-[Verify Your Account Now]
-Thank you,
-The Goggle Security Team
-If you do not click the link within 24 hours, your account will be permanently deactivated.
-```
-**Legitimate Email:**
-```
-Good morning,
-
-11+ Exam Preparation Courses In May Half-Term📝
-📚 You can view all available 5 day courses in May Half-Term here
-Please note, each course has a limited number of spaces. In the summer, places are reserved very quickly and we are unable to provide more.
-
-NEW Free 11 Plus Practice Paper 🆓
-✍️ 11+ ISEB Common Pre-Test Mathematics Paper 6
-Please note, each free practice paper is available for download from our website for one week only.
-
-If you have any questions, or if you’d like to discuss your child’s 11 Plus preparation specifically, please feel free to email us directly: teamkeen@theexamcoach.tv
-
-Best wishes,
-The Exam Coach Team
-```
+* **Phishing Email:**
+ ```
+ From: noreply@g00gleacc.com (Note the zero in google)
+ Subject: Urgent: Suspicious sign-in attempt
+ Dear User,
+ Someone recently used your password to sign in to your account. We have blocked this login attempt. Please check your account activity and update your password immediately by clicking the link below:
+ [Verify Your Account Now]
+ Thank you,
+ The Goggle Security Team
+ If you do not click the link within 24 hours, your account will be permanently deactivated.
+ ```
+* **Legitimate Email:**
+ ```
+ Good morning,
+ 
+ 11+ Exam Preparation Courses In May Half-Term📝
+ 📚 You can view all available 5 day courses in May Half-Term here
+ Please note, each course has a limited number of spaces. In the summer, places are reserved very quickly and we are unable to provide more.
+ 
+ NEW Free 11 Plus Practice Paper 🆓
+ ✍️ 11+ ISEB Common Pre-Test Mathematics Paper 6
+ Please note, each free practice paper is available for download from our website for one week only.
+ 
+ If you have any questions, or if you’d like to discuss your child’s 11 Plus preparation specifically, please feel free to email us directly: teamkeen@theexamcoach.tv
+ 
+ Best wishes,
+ The Exam Coach Team
+ ```
 
 ### If running locally
 To run this application on your own machine, you will need two terminal windows open, one for the backend and one for the frontend.
