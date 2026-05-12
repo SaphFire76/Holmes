@@ -1,6 +1,6 @@
 # Holmes: LLM-Powered Phishing Detection App
 
-### Demo Video
+### Demo video
 [![Holmes Demo Video](https://img.youtube.com/vi/QnygQdTzr_0/0.jpg)](https://www.youtube.com/watch?v=QnygQdTzr_0)
 
 ### What the software does
