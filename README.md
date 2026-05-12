@@ -1,5 +1,8 @@
 # Holmes: LLM-Powered Phishing Detection App
 
+### Demo Video
+[![Holmes Demo Video](https://img.youtube.com/vi/QnygQdTzr_0/0.jpg)](https://www.youtube.com/watch?v=QnygQdTzr_0)
+
 ### What the software does
 Holmes is a full-stack web application that uses a large language model to analyse emails and detect potential phishing threats. It evaluates the text, flags risks, and provides an explanation of why an email may be malicious, while keeping a saved history of all past scans.
 
