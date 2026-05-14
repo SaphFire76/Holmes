@@ -84,17 +84,77 @@ class AIModelAdaptor(ABC):
     def analyse(self, email:str) -> dict:
         pass
 
+    def get_system_prompt(self) -> str:
+        return """
+            You are an expert cybersecurity analyst. Your only task is to analyze an email and determine if it is phishing or safe.
+            
+            CRITICAL RULES:
+            1. ZERO TRUST POLICY: If an email contains ANY suspicious elements (e.g., unexpected links, slight urgency, unusual requests), flag it as phishing. Do not give the sender the benefit of the doubt.
+            2. Flag subtle manipulation: Even if an email looks like standard corporate communication or an automated newsletter, flag it if it attempts to harvest credentials, bypass standard procedures, or manipulate the recipient.
+            3. Do not assume an email is safe just because it lacks an obvious malicious link; pure social engineering attempts must be flagged.
+            4. If ambiguous or you are unsure, default to Phishing ("is_phishing": true).
+            5. You must return a raw JSON object and absolutely nothing else.
+        """
+
     def get_prompt(self, email: str) -> str:
         return f"""
-        Analyse this email for phishing indicators.
-        Email: "{email}"
-        
-        Return a raw JSON object with this structure:
-        {{
-            "is_phishing": boolean,
-            "risk_level": "Low" | "Medium" | "High",
-            "explanation": "Concise reason why."
-        }}
+            Here are examples of how to classify emails:
+
+            --- EXAMPLE 1: Safe Email ---
+            Email: "Ok, Iknow this is blatantly OT but I'm beginning to go insane.\nHad an old Dell Dimension XPS sitting in the corner and decided to\nput it to use, I know it was working pre being stuck in the\ncorner, but when I plugged it in, hit the power nothing happened.\nI opened her up and had a look and say nothing much. A little orange\nLED comes on when I plug her in but that's it, after some googling\nI found some reference to re-seating all the parts, but no change.\nThe problem I'm having is that since the power supply is some Dell\nspecific one, ATX block with what looks like one of the old AT\npower connectors, I cant figure out weather this is a Mobo prob\nor a PSU prob. Just to futily try and drag this back OT, I want\nto install Linux on it when I get it working. If anyone knows\nwhat the problem might be give me a shout.Cheers,\nPeter.--\nPeter Aherne, Software Engineer, \nMotorola Ireland Ltd.\nPh: +353 21 4511234 Mobile: +353 87 2246834-- \nIrish Linux Users' Group: ilug@linux.ie\nhttp://www.linux.ie/mailman/listinfo/ilug for (un)subscription information.\nList maintainer: listmaster@linux.ie"
+            Output:
+            {{
+                "explanation": "Technical support inquiry sent to a public mailing list. It contains a verifiable signature block with standard contact details, lacks any fabricated urgency or requests for sensitive information, and the included URL is a standard, safe mailing list administrative link. While the email has some spelling errors, it does not contain any of the common indicators of phishing such as suspicious links, requests for sensitive information, or unrealistic offers. The tone and content are consistent with a legitimate technical support request.",
+                "risk_level": "Low",
+                "is_phishing": false
+            }}
+
+            --- EXAMPLE 2: Phishing Email ---
+            Email: 'emailing : mon , 30 aug 2004 19 : 28 : 52 - 0800 dear sir / madam ; from our records we understand that you are inquiring about a new profession . we have a limited , ont time offer . our university can offer you a pre - qualified degree in your field of choice . we offer signing bonuses of up to $ 15 , 000 in your profession . to obtain your degree with valid transcripts & information on new career bonusus , follow our link : sincerely , dr . julie paige administration office this communication is of private matter . if you have received this and ar enot the individual or group it may concern or show interest in this please follow so we know http : / / 1 highereducation . com / st . html and the proper measures will proficiently expidited in a timely manner .'
+            Output:
+            {{
+                "explanation": "Uses a generic greeting, contains multiple spelling and grammatical errors ('ont time', 'bonusus', 'expidited'), offers highly big unrealistic financial incentive ('$ 15 , 000') for a 'pre-qualified degree'. Too good to be true. Directs the victim to a suspicious, unofficial domain. The email also mentions 'limited on time offer' which is a common tactic to create urgency and pressure the recipient into acting without due consideration. All of these are strong indicators of a phishing attempt.",
+                "risk_level": "High",
+                "is_phishing": true
+            }}
+
+            --- EXAMPLE 3: Phishing Email ---
+            Email: "returned mail : see transcript for details the original message was received at tue , 19 jul 2005 07 : 06 : 09 - 0400 from root @ localhost - - - - - the following addresses had permanent fatal errors - - - - - antique ( reason : can \' t create ( user ) output file ) ( expanded from : ) - - - - - transcript of session follows - - - - - procmail : quota exceeded while writing " / var / spool / mail / antique " 550 5 . 0 . 0 antique . . . can \' t create output"
+            Output:
+            {{
+                "explanation": "This is a classic 'Fake NDR' (Non-Delivery Report) or 'Quota Exceeded' spoof. The email mimics an automated server error ('fatal errors', 'quota exceeded') to create sudden panic or confusion. Phishers frequently spoof these administrative bounce messages to trick victims into clicking a malicious link to 'upgrade their quota' or 'view the undelivered message', bypassing the victim's natural skepticism of external emails.",
+                "risk_level": "High",
+                "is_phishing": true
+            }}
+
+            --- EXAMPLE 4: Safe Email ---
+            Email: "please grant access : application request ( kker - 4 r 3 klb ) security resource line item request kker - 4 r 3 klb has been submitted for your processing . to view the request , click your left mouse button on the notes document link below ."
+            Output:
+            {{
+                "explanation": "Appears to be a legitimate, automated internal IT or ticketing system notification. It includes a highly specific, standard-formatted reference tracking code ('kker - 4 r 3 klb') and uses dry, administrative language. It does not threaten negative consequences or create artificial urgency. The instruction to click a 'notes document link' is standard operational practice for legacy enterprise environments (like Lotus Notes).",
+                "risk_level": "Low",
+                "is_phishing": false
+            }}
+            
+            --- EXAMPLE 5: Safe Email ---
+            Email: 'hpl nom for may 11 , 2001 ( see attached file : hplno 511 . xls ) - hplno 511 . xls'
+            Output:
+            {{
+                "explanation": "This is a routine, automated or highly abbreviated B2B transactional email. It uses specific operational shorthand ('hpl nom', indicating a daily business nomination) paired with a specific date. The attached spreadsheet ('hplno 511 . xls') directly correlates with the date (May 11 -> 5/11) and the context of the message. It contains zero social engineering indicators, no artificial urgency, and no requests for credentials, pointing to a standard, safe internal workflow.",
+                "risk_level": "Low",
+                "is_phishing": false
+            }}
+
+            --- ACTUAL TASK ---
+            Analyse this email for phishing indicators.
+            Email: "{email}"
+
+            Return a raw JSON object with this exact structure:
+            {{
+                "explanation": "Step-by-step reasoning of the technical and social indicators...",
+                "risk_level": "Low" | "Medium" | "High",
+                "is_phishing": true/false
+            }}
         """
     
 
@@ -104,13 +164,16 @@ class GoogleGenAIAdaptor(AIModelAdaptor):
         self.client = genai.Client(api_key=api_key)
 
     def analyse(self, email: str) -> dict:
+        system_rules = self.get_system_prompt()
         prompt = self.get_prompt(email)
         print(f"Generated prompt for Google GenAI:\n{prompt}\n")
         verdict = self.client.models.generate_content(
             model="gemini-3-flash-preview",
             contents=prompt,
             config=types.GenerateContentConfig(
-                response_mime_type='application/json' 
+                system_instruction=system_rules,
+                response_mime_type='application/json',
+                temperature=0.0
             )
         )
         print(f"Received verdict from Google GenAI:\n{verdict.text}\n")
@@ -123,13 +186,19 @@ class LocalModelAdaptor(AIModelAdaptor):
         self.api_url = os.getenv("OLLAMA_API_URL", "http://localhost:11434/api/generate")
 
     def analyse(self, email: str) -> dict:
+        system_rules = self.get_system_prompt()
         prompt = self.get_prompt(email)
         
         payload = {
             "model": self.model_name,
+            "system": system_rules,
             "prompt": prompt,
             "format": "json",  # Forces local model into JSON mode
-            "stream": False
+            "stream": False,
+            "options": {
+                "temperature": 0.0,
+                "num_ctx": 4096
+            }
         }
         
         response = requests.post(self.api_url, json=payload)

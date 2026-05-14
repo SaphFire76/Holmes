@@ -975,3 +975,17 @@ nav {
     font-size: inherit;
     cursor: pointer;
 }
+
+.guest-login {
+    background-color: transparent;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.guest-login button {
+    background-color: transparent;
+    border: none;
+    color: var(--third-colour);
+    font-size: inherit;
+    cursor: pointer;
+}

@@ -13,23 +13,22 @@ function Login() {
 
     const navigate = useNavigate();
 
-    const handleLogin = async () => {
+    // Add parameters with default values
+    const handleLogin = async (manualEmail = null, manualPassword = null) => {
         setIsLoading(true);
         setError(null);
 
+        // Use the passed arguments if they exist; otherwise, use state
+        const loginEmail = manualEmail || email;
+        const loginPassword = manualPassword || password;
+
         try {
-            // 1. Call the service file to do the heavy lifting
-            const data = await loginUser(email, password);
+            // Use the local constants here, not the state variables
+            const data = await loginUser(loginEmail, loginPassword);
 
-            // 2. Success! Save the JWT to the browser
             localStorage.setItem('access_token', data.access_token);
-            
-            // 3. The Magic Routing Trick! 
-            // We redirect to the Dashboard, smuggling the history data in the router state
             navigate('/');
-
         } catch (err) {
-            // 4. Catch the error thrown by the service file
             setError(err.message);
         } finally {
             setIsLoading(false);
@@ -75,6 +74,13 @@ function Login() {
                 </form>
                 <div className="auth-redirect">
                     <button onClick={() => navigate('/register')}>Don't have an account? Register</button>
+                </div>
+                <div className="guest-login">
+                    <button onClick={async () => {
+                        await handleLogin('test@test.com', 'password');
+                    }}>
+                        Continue as Guest
+                    </button>
                 </div>
             </div>
         </div>

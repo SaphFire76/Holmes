@@ -1,0 +1,2 @@
+Model,Accuracy,Precision,Recall,F1 Score
+llama3:latest,0.92,0.8780487804878049,0.9230769230769231,0.9
